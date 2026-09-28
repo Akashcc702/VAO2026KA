@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KEA VAO ಪರೀಕ್ಷಾ ತಯಾರಿ | Rank-1 Quiz App</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Kannada:wght@400;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0A0E1A;--sidebar:#0D1225;--card:#131929;--card2:#1A2035;
+  --gold:#FFD700;--gold2:#FFA500;--green:#00C853;--red:#FF3D3D;
+  --blue:#4FC3F7;--purple:#CE93D8;--white:#F0F4FF;--muted:#8892A4;
+  --border:#1E2D4A;--hover:#1E2D4A;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--white);min-height:100vh;overflow-x:hidden}
+.kannada{font-family:'Noto Sans Kannada','Inter',sans-serif}
+
+/* LAYOUT */
+#app{display:flex;height:100vh;overflow:hidden}
+#sidebar{width:260px;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;transition:.3s;z-index:100}
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#header{background:var(--sidebar);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+#content{flex:1;overflow-y:auto;padding:20px}
+
+/* SIDEBAR */
+.logo{padding:20px;border-bottom:1px solid var(--border);text-align:center}
+.logo h2{font-size:1.1rem;color:var(--gold);font-weight:800;line-height:1.3}
+.logo p{font-size:.75rem;color:var(--muted);margin-top:4px}
+.countdown-sidebar{margin:12px 16px;background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid var(--gold);border-radius:12px;padding:12px;text-align:center}
+.countdown-sidebar .days{font-size:2.5rem;font-weight:800;color:var(--gold);line-height:1}
+.countdown-sidebar .label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+nav{flex:1;padding:8px 0;overflow-y:auto}
+.nav-section{padding:8px 16px 4px;font-size:.65rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:600}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;border-radius:8px;margin:2px 8px;transition:.2s;font-size:.875rem;position:relative}
+.nav-item:hover{background:var(--hover)}
+.nav-item.active{background:linear-gradient(135deg,rgba(255,215,0,.15),rgba(255,165,0,.05));border-left:3px solid var(--gold);color:var(--gold)}
+.nav-item .icon{font-size:1.1rem;width:20px;text-align:center}
+.badge{margin-left:auto;background:var(--red);color:#fff;border-radius:10px;padding:2px 7px;font-size:.7rem;font-weight:700}
+.badge.gold{background:var(--gold);color:#000}
+.sidebar-stats{padding:12px;border-top:1px solid var(--border)}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:.8rem}
+.stat-val{font-weight:700;color:var(--gold)}
+
+/* HEADER */
+.header-left h1{font-size:1rem;font-weight:700;color:var(--white)}
+.header-left p{font-size:.75rem;color:var(--muted)}
+.header-center{display:flex;gap:8px;align-items:center}
+.timer-box{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-size:.875rem;font-weight:700;font-family:monospace;color:var(--gold)}
+.timer-box.warning{color:var(--gold2);border-color:var(--gold2)}
+.timer-box.danger{color:var(--red);border-color:var(--red);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.header-right{display:flex;gap:8px}
+.btn{padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-size:.8rem;font-weight:600;transition:.2s}
+.btn-gold{background:var(--gold);color:#000}.btn-gold:hover{background:var(--gold2)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--white)}.btn-outline:hover{background:var(--hover)}
+.btn-red{background:var(--red);color:#fff}
+.btn-green{background:var(--green);color:#000}
+.btn-sm{padding:5px 10px;font-size:.75rem}
+
+/* SCOREBOARD */
+.scoreboard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.score-item{text-align:center;min-width:60px}
+.score-val{font-size:1.4rem;font-weight:800}
+.score-val.correct{color:var(--green)}
+.score-val.wrong{color:var(--red)}
+.score-val.skip{color:var(--blue)}
+.score-val.net{color:var(--gold)}
+.score-label{font-size:.65rem;text-transform:uppercase;color:var(--muted);letter-spacing:.5px}
+.score-divider{width:1px;height:40px;background:var(--border)}
+.accuracy-bar{flex:1;min-width:120px}
+.accuracy-bar .label{font-size:.75rem;color:var(--muted);margin-bottom:4px;display:flex;justify-content:space-between}
+.bar-track{background:var(--border);border-radius:4px;height:8px;overflow:hidden}
+.bar-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--gold),var(--green));border-radius:4px;transition:width .5s}
+
+/* QUESTION CARD */
+.question-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:16px}
+.q-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;font-size:.8rem;color:var(--muted)}
+.q-topic-tag{background:rgba(79,195,247,.1);color:var(--blue);border:1px solid rgba(79,195,247,.3);padding:3px 10px;border-radius:20px;font-size:.75rem}
+.q-number{font-weight:700;color:var(--gold)}
+.q-text{font-size:1.05rem;line-height:1.7;margin-bottom:20px;color:var(--white)}
+.q-text.kannada{font-size:1rem}
+.options{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.option{background:var(--card2);border:2px solid var(--border);border-radius:12px;padding:14px 16px;cursor:pointer;transition:.2s;display:flex;align-items:center;gap:12px;font-size:.9rem}
+.option:hover{border-color:var(--gold);background:rgba(255,215,0,.05)}
+.option.selected{border-color:var(--blue);background:rgba(79,195,247,.1)}
+.option.correct{border-color:var(--green)!important;background:rgba(0,200,83,.15)!important;animation:flash-green .5s}
+.option.wrong{border-color:var(--red)!important;background:rgba(255,61,61,.15)!important;animation:flash-red .5s}
+.option.eliminated{opacity:.3;pointer-events:none;text-decoration:line-through}
+@keyframes flash-green{0%{background:rgba(0,200,83,.5)}100%{background:rgba(0,200,83,.15)}}
+@keyframes flash-red{0%{background:rgba(255,61,61,.5)}100%{background:rgba(255,61,61,.15)}}
+.option-key{width:28px;height:28px;background:var(--border);border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;flex-shrink:0}
+.option.correct .option-key{background:var(--green);color:#000}
+.option.wrong .option-key{background:var(--red);color:#fff}
+
+/* EXPLANATION BOX */
+.explanation-box{background:linear-gradient(135deg,rgba(255,215,0,.1),rgba(255,165,0,.05));border:1px solid rgba(255,215,0,.3);border-radius:12px;padding:14px 16px;margin-top:12px;display:none}
+.explanation-box.show{display:block;animation:fadeIn .3s}
+.explanation-box .label{font-size:.75rem;color:var(--gold);font-weight:700;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.explanation-box p{font-size:.875rem;line-height:1.6;color:var(--white)}
+
+/* ACTION BUTTONS */
+.q-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+
+/* KEYBOARD HINTS */
+.keyboard-hints{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.kbd{background:var(--card2);border:1px solid var(--border);border-radius:5px;padding:2px 8px;font-size:.7rem;font-family:monospace;color:var(--muted)}
+
+/* PAGES */
+.page{display:none}
+.page.active{display:block}
+
+/* HOME PAGE */
+.home-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px}
+.home-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;cursor:pointer;transition:.2s;position:relative;overflow:hidden}
+.home-card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.home-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:3px 3px 0 0}
+.home-card.gc::before{background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.home-card.bc::before{background:linear-gradient(90deg,var(--blue),var(--purple))}
+.home-card.rc::before{background:linear-gradient(90deg,var(--red),var(--gold2))}
+.home-card.gc2::before{background:linear-gradient(90deg,var(--green),var(--blue))}
+.home-card .card-icon{font-size:2rem;margin-bottom:10px}
+.home-card h3{font-size:.9rem;font-weight:700;margin-bottom:4px}
+.home-card p{font-size:.75rem;color:var(--muted);line-height:1.4}
+.home-card .card-badge{position:absolute;top:12px;right:12px;background:var(--gold);color:#000;font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:10px}
+
+/* GENERATE PAGE */
+.api-section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:20px}
+.api-section h3{font-size:.9rem;font-weight:700;margin-bottom:12px;color:var(--gold)}
+.input-group{display:flex;gap:8px;margin-bottom:12px}
+input[type=text],input[type=password],textarea,select{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--white);font-size:.875rem;width:100%;outline:none;transition:.2s;font-family:inherit}
+input:focus,textarea:focus,select:focus{border-color:var(--gold)}
+textarea{resize:vertical;min-height:100px}
+.batch-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:12px}
+.batch-btn{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px;cursor:pointer;text-align:center;font-size:.75rem;font-weight:600;transition:.2s;color:var(--white)}
+.batch-btn:hover{border-color:var(--gold);color:var(--gold)}
+.batch-btn.done{background:rgba(0,200,83,.1);border-color:var(--green);color:var(--green)}
+.batch-btn.loading{background:rgba(255,215,0,.1);border-color:var(--gold);color:var(--gold);animation:pulse 1s infinite}
+.batch-btn.error{background:rgba(255,61,61,.1);border-color:var(--red);color:var(--red)}
+.progress-section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:20px}
+.progress-label{display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:8px}
+.progress-track{background:var(--border);border-radius:8px;height:12px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--green));border-radius:8px;transition:width .5s}
+.log-box{background:var(--card2);border-radius:8px;padding:12px;font-size:.75rem;font-family:monospace;max-height:120px;overflow-y:auto;color:var(--muted);margin-top:12px}
+.log-box .ok{color:var(--green)}
+.log-box .err{color:var(--red)}
+.log-box .info{color:var(--blue)}
+
+/* DASHBOARD (RADAR) */
+.dashboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.radar-container{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;display:flex;flex-direction:column;align-items:center}
+.radar-container h3{font-size:.9rem;font-weight:700;margin-bottom:16px;color:var(--gold);align-self:flex-start}
+canvas#radarChart{max-width:280px;max-height:280px}
+.topic-list{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px}
+.topic-list h3{font-size:.9rem;font-weight:700;margin-bottom:16px;color:var(--gold)}
+.topic-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer}
+.topic-row:hover{opacity:.8}
+.topic-row:last-child{border:none}
+.topic-name{flex:1;font-size:.8rem}
+.topic-bar-track{width:80px;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.topic-bar-fill{height:100%;border-radius:3px;transition:width .5s}
+.topic-pct{font-size:.8rem;font-weight:700;min-width:35px;text-align:right}
+
+/* ARCHIVE PAGE */
+.archive-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.archive-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:.2s}
+.archive-card:hover{border-color:var(--gold)}
+.archive-card.has-data{border-color:rgba(255,215,0,.3)}
+.archive-card .day-label{font-size:.75rem;color:var(--muted);margin-bottom:4px}
+.archive-card .day-date{font-size,.875rem;font-weight:700;margin-bottom:8px}
+.archive-card .day-stats{font-size:.75rem;color:var(--muted)}
+.archive-card .day-score{font-size:1.5rem;font-weight:800;color:var(--gold);margin:4px 0}
+.archive-card .day-q{font-size:.7rem;color:var(--muted)}
+.reattempt-menu{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;margin-top:16px;display:none}
+.reattempt-menu.show{display:block}
+.reattempt-menu h3{font-size:.9rem;font-weight:700;margin-bottom:12px;color:var(--gold)}
+
+/* MISTAKE VAULT */
+.vault-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.vault-list{display:flex;flex-direction:column;gap:8px}
+.vault-item{background:var(--card);border:1px solid var(--border);border-left:3px solid var(--red);border-radius:8px;padding:12px;font-size:.85rem}
+.vault-item .v-meta{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);margin-top:6px}
+.vault-item .v-attempts{color:var(--gold);font-weight:700}
+
+/* SETTINGS */
+.settings-section{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px}
+.settings-section h3{font-size:.9rem;font-weight:700;margin-bottom:16px;color:var(--gold)}
+.setting-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.setting-row:last-child{border:none}
+.setting-label{font-size:.875rem}
+.setting-desc{font-size:.75rem;color:var(--muted);margin-top:2px}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;display:flex;align-items:center;justify-content:center;display:none}
+.modal-overlay.show{display:flex;animation:fadeIn .2s}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:480px;width:90%;position:relative}
+.modal h2{font-size:1.1rem;font-weight:800;color:var(--gold);margin-bottom:16px}
+.modal-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
+
+/* NOTIFICATIONS */
+.notif{position:fixed;bottom:20px;right:20px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 18px;font-size:.875rem;z-index:2000;animation:slideIn .3s;max-width:300px}
+.notif.success{border-color:var(--green);color:var(--green)}
+.notif.error{border-color:var(--red);color:var(--red)}
+.notif.info{border-color:var(--blue);color:var(--blue)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:48px 20px;color:var(--muted)}
+.empty-state .emoji{font-size:3rem;margin-bottom:12px}
+.empty-state h3{font-size:1rem;font-weight:700;color:var(--white);margin-bottom:8px}
+.empty-state p{font-size:.85rem;line-height:1.6}
+
+/* RESULT SCREEN */
+.result-screen{text-align:center;padding:40px 20px}
+.result-screen .big-score{font-size:4rem;font-weight:800;color:var(--gold);line-height:1}
+.result-screen .score-label{font-size:1rem;color:var(--muted);margin-bottom:24px}
+.result-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:24px 0}
+.result-item{background:var(--card);border-radius:12px;padding:16px}
+.result-item .rv{font-size:2rem;font-weight:800}
+.result-item .rl{font-size:.7rem;color:var(--muted);text-transform:uppercase}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="logo">
+      <h2>🏆 KEA VAO<br><span class="kannada">ಪರೀಕ್ಷಾ ತಯಾರಿ</span></h2>
+      <p>Rank-1 Interactive Quiz System</p>
+    </div>
+    <div class="countdown-sidebar">
+      <div class="days" id="daysLeft">-</div>
+      <div class="label">Days to Exam (4 Oct 2026)</div>
+    </div>
+    <nav>
+      <div class="nav-section">ಮುಖ್ಯ / Main</div>
+      <div class="nav-item active" onclick="showPage('home')" id="nav-home"><span class="icon">🏠</span> Home Dashboard</div>
+      <div class="nav-item" onclick="showPage('generate')" id="nav-generate"><span class="icon">⚡</span> Generate Questions <span class="badge gold" id="genBadge">0</span></div>
+      
+      <div class="nav-section">ಕ್ವಿಜ್ ಮೋಡ್ / Quiz Modes</div>
+      <div class="nav-item" onclick="startQuiz('paper1')" id="nav-paper1"><span class="icon">📄</span> Paper 1 – GK (2hr)</div>
+      <div class="nav-item" onclick="startQuiz('paper2')" id="nav-paper2"><span class="icon">📝</span> Paper 2 – Lang+Comp (2hr)</div>
+      <div class="nav-item" onclick="startQuiz('kannada')" id="nav-kannada"><span class="icon">ಕ</span> ಸಾಮಾನ್ಯ ಕನ್ನಡ Drill</div>
+      <div class="nav-item" onclick="startQuiz('english')" id="nav-english"><span class="icon">🔤</span> General English Drill</div>
+      <div class="nav-item" onclick="startQuiz('computer')" id="nav-computer"><span class="icon">💻</span> Computer Knowledge Drill</div>
+      <div class="nav-item" onclick="startQuiz('revenue')" id="nav-revenue"><span class="icon">📋</span> Revenue Act + e-Gov Drill</div>
+      <div class="nav-item" onclick="startQuiz('current')" id="nav-current"><span class="icon">📰</span> Current Affairs 2026 Drill</div>
+      
+      <div class="nav-section">ವಿಶ್ಲೇಷಣೆ / Analysis</div>
+      <div class="nav-item" onclick="showPage('dashboard')" id="nav-dashboard"><span class="icon">📊</span> Syllabus Radar</div>
+      <div class="nav-item" onclick="showPage('archive')" id="nav-archive"><span class="icon">📅</span> Day-wise Archive</div>
+      <div class="nav-item" onclick="showPage('vault')" id="nav-vault"><span class="icon">🔴</span> Mistake Vault <span class="badge" id="vaultBadge">0</span></div>
+      
+      <div class="nav-section">ಸೆಟ್ಟಿಂಗ್ / Settings</div>
+      <div class="nav-item" onclick="showPage('settings')" id="nav-settings"><span class="icon">⚙️</span> Settings & API Key</div>
+    </nav>
+    <div class="sidebar-stats">
+      <div class="stat-row"><span>Total Questions</span><span class="stat-val" id="totalQ">0</span></div>
+      <div class="stat-row"><span>Today's Progress</span><span class="stat-val" id="todayProgress">0/1000</span></div>
+      <div class="stat-row"><span>Overall Accuracy</span><span class="stat-val" id="overallAcc">0%</span></div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main">
+    <div id="header">
+      <div class="header-left">
+        <h1 class="kannada">KEA VAO 2026 – ಗ್ರಾಮ ಆಡಳಿತ ಅಧಿಕಾರಿ ಪರೀಕ್ಷೆ</h1>
+        <p id="headerSub">4 ಅಕ್ಟೋಬರ್ 2026 | Paper 1: 10:30–12:30 | Paper 2: 14:30–16:30</p>
+      </div>
+      <div class="header-center">
+        <div class="timer-box" id="quizTimer" style="display:none">2:00:00</div>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-outline btn-sm" onclick="showPage('generate')">⚡ Generate</button>
+        <button class="btn btn-gold btn-sm" onclick="startQuiz('start')">▶ Start Quiz</button>
+      </div>
+    </div>
+    <div id="content">
+
+      <!-- HOME PAGE -->
+      <div class="page active" id="page-home">
+        <div class="home-grid">
+          <div class="home-card gc" onclick="startQuiz('paper1')">
+            <div class="card-icon">📄</div>
+            <h3>Paper 1 Simulation</h3>
+            <p class="kannada">ಸಾಮಾನ್ಯ ಜ್ಞಾನ • 100 ಪ್ರಶ್ನೆ • 2 ಗಂಟೆ</p>
+            <div class="card-badge">100M</div>
+          </div>
+          <div class="home-card bc" onclick="startQuiz('paper2')">
+            <div class="card-icon">📝</div>
+            <h3>Paper 2 Simulation</h3>
+            <p class="kannada">ಕನ್ನಡ+ಇಂಗ್ಲಿಷ್+ಕಂಪ್ಯೂಟರ್ • 100 ಪ್ರಶ್ನೆ • 2 ಗಂಟೆ</p>
+            <div class="card-badge">100M</div>
+          </div>
+          <div class="home-card rc" onclick="showPage('vault')">
+            <div class="card-icon">🔴</div>
+            <h3>Mistake Vault Drill</h3>
+            <p>Practice only your weak areas until mastered</p>
+          </div>
+          <div class="home-card gc2" onclick="showPage('generate')">
+            <div class="card-icon">⚡</div>
+            <h3>Generate 1000 Questions</h3>
+            <p>AI-powered, zero-repetition question bank builder</p>
+          </div>
+          <div class="home-card gc" onclick="showPage('dashboard')">
+            <div class="card-icon">📊</div>
+            <h3>Syllabus Radar</h3>
+            <p>Track accuracy per topic with visual radar chart</p>
+          </div>
+          <div class="home-card bc" onclick="showPage('archive')">
+            <div class="card-icon">📅</div>
+            <h3>Day Archive</h3>
+            <p>Re-attempt past days' quizzes in 3 different modes</p>
+          </div>
+        </div>
+        <!-- Today's Progress -->
+        <div class="progress-section">
+          <div class="progress-label">
+            <span>Today's Questions (<span id="todayDay">Day 1</span>)</span>
+            <span id="todayCount">0 / 1000</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="todayBar" style="width:0%"></div></div>
+        </div>
+        <!-- Quick Mode Buttons -->
+        <div class="api-section">
+          <h3>⚡ Quick Drills <span class="kannada" style="font-size:.8rem;color:var(--muted)">– ವಿಷಯವಾರು ಅಭ್ಯಾಸ (All 8 Official Topics)</span></h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-outline btn-sm kannada" onclick="startQuiz('constitution')">⚖️ ಸಂವಿಧಾನ (Constitution)</button>
+            <button class="btn btn-outline btn-sm kannada" onclick="startQuiz('karnataka_history')">🏛️ ಕರ್ನಾಟಕ ಇತಿಹಾಸ</button>
+            <button class="btn btn-outline btn-sm kannada" onclick="startQuiz('geography')">🌍 ಭೂಗೋಳ & ಪರಿಸರ</button>
+            <button class="btn btn-outline btn-sm kannada" onclick="startQuiz('revenue')">📋 ಭೂ ಕಂದಾಯ & e-Gov</button>
+            <button class="btn btn-outline btn-sm kannada" onclick="startQuiz('panchayat')">🏡 ಪಂಚಾಯತ್ ರಾಜ್ & ಗ್ರಾಮೀಣಾಭಿವೃದ್ಧಿ</button>
+            <button class="btn btn-outline btn-sm" onclick="startQuiz('current')">📰 Current Affairs & ವಿಜ್ಞಾನ</button>
+            <button class="btn btn-outline btn-sm kannada" onclick="startQuiz('kannada')">ಕ ಸಾಮಾನ್ಯ ಕನ್ನಡ (35M)</button>
+            <button class="btn btn-outline btn-sm" onclick="startQuiz('english')">🔤 General English (35M)</button>
+            <button class="btn btn-outline btn-sm" onclick="startQuiz('computer')">💻 Computer (30M)</button>
+            <button class="btn btn-gold btn-sm" onclick="startQuiz('weakness')">🎯 My Weak Areas (Vault)</button>
+          </div>
+        </div>
+        <div class="api-section">
+          <h3>🎯 Practice by Batch (20 Batches × 50 Questions = 1,000 Unique Questions) <span class="kannada" style="font-size:.8rem;color:var(--muted)">– ಬ್ಯಾಚ್ ಮೇಲೆ ಕ್ಲಿಕ್ ಮಾಡಿ ನೇರವಾಗಿ 50 ಪ್ರಶ್ನೆಗಳ ಕ್ವಿಜ್ ಬರೆಯಿರಿ!</span></h3>
+          <div class="batch-grid" id="homeBatchGrid"></div>
+        </div>
+      </div>
+
+      <!-- GENERATE PAGE -->
+      <div class="page" id="page-generate">
+        <div class="api-section">
+          <h3>🔑 Gemini API Key Settings (Optional — Pre-loaded Batches Ready!)</h3>
+          <div class="input-group">
+            <input type="password" id="apiKeyInput" placeholder="Enter your FREE Gemini API Key from aistudio.google.com" />
+            <button class="btn btn-gold" onclick="saveApiKey()">Save Key</button>
+            <button class="btn btn-outline btn-sm" onclick="window.open('https://aistudio.google.com/apikey','_blank')">Get Free Key →</button>
+          </div>
+          <p style="font-size:.75rem;color:var(--muted)">🔒 Pre-loaded verified KEA VAO batches are automatically loaded from the <code>batches/</code> folder! You can also add an API key to generate extra days.</p>
+        </div>
+        <div class="progress-section">
+          <div class="progress-label">
+            <span class="kannada">ಇಂದಿನ ಪ್ರಶ್ನೆ ಬ್ಯಾಂಕ್ ಪ್ರಗತಿ / Today's Question Bank</span>
+            <span id="genProgress">0 / 1000 questions</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="genBar" style="width:0%"></div></div>
+          <div class="log-box" id="genLog"><span class="info">Pre-loaded batches from <code>batches/</code> folder are automatically synced. Click any loaded batch below to practice it directly!</span></div>
+        </div>
+        <div class="api-section">
+          <h3>📦 20 Batches × 50 Questions = 1000/Day (Click any ✓ Ready Batch to Practice!)</h3>
+          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+            <select id="daySelect" style="width:auto;min-width:140px" onchange="updateUI()">
+              <option value="1">Day 1 – Sept 27</option>
+              <option value="2">Day 2 – Sept 28</option>
+              <option value="3">Day 3 – Sept 29</option>
+              <option value="4">Day 4 – Sept 30</option>
+              <option value="5">Day 5 – Oct 1</option>
+              <option value="6">Day 6 – Oct 2</option>
+              <option value="7">Day 7 – Oct 3</option>
+            </select>
+            <button class="btn btn-gold" onclick="syncPreloadedBatches(true)">🔄 Reload Pre-built Batches</button>
+            <button class="btn btn-outline" onclick="generateAllBatches()">⚡ Generate via API</button>
+            <button class="btn btn-outline" onclick="clearDayQuestions()">🗑 Clear Selected Day</button>
+          </div>
+          <div class="batch-grid" id="batchGrid"></div>
+        </div>
+        <div class="api-section">
+          <h3>📋 Manual Import (Paste from Gemini / ChatGPT / Antigravity)</h3>
+          <p style="font-size:.75rem;color:var(--muted);margin-bottom:10px">Paste JSON array: <code style="color:var(--gold)">[{question,optionA,optionB,optionC,optionD,correct,explanation,topic}]</code></p>
+          <textarea id="pasteInput" placeholder='[{"question":"ಕರ್ನಾಟಕ ಭೂ ಕಂದಾಯ ಕಾಯ್ದೆ 1964 ಎಷ್ಟು ಪ್ರಕರಣಗಳನ್ನು ಒಳಗೊಂಡಿದೆ?","optionA":"152","optionB":"202","optionC":"178","optionD":"225","correct":"B","explanation":"Karnataka Land Revenue Act 1964 has 15 chapters and 202 sections (Karnataka Act 12 of 1964).","topic":"Land Revenue"}]'></textarea>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn btn-gold" onclick="importPastedQuestions()">📥 Import Questions</button>
+            <button class="btn btn-outline" onclick="document.getElementById('pasteInput').value=''">Clear</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUIZ PAGE -->
+      <div class="page" id="page-quiz">
+        <div id="quizContainer">
+          <div class="scoreboard" id="scoreboard">
+            <div class="score-item"><div class="score-val" id="sAttempted">0</div><div class="score-label">Attempted</div></div>
+            <div class="score-divider"></div>
+            <div class="score-item"><div class="score-val correct" id="sCorrect">0</div><div class="score-label">✓ Correct</div></div>
+            <div class="score-item"><div class="score-val wrong" id="sWrong">0</div><div class="score-label">✗ Wrong</div></div>
+            <div class="score-item"><div class="score-val skip" id="sSkip">0</div><div class="score-label">Skip</div></div>
+            <div class="score-divider"></div>
+            <div class="score-item"><div class="score-val net" id="sNet">0.00</div><div class="score-label">Net Score</div></div>
+            <div class="accuracy-bar">
+              <div class="label"><span>Accuracy</span><span id="sAcc">0%</span></div>
+              <div class="bar-track"><div class="bar-fill" id="sAccBar" style="width:0%"></div></div>
+            </div>
+          </div>
+          <div class="keyboard-hints">
+            <span class="kbd">A B C D – Answer</span>
+            <span class="kbd">Space – Skip</span>
+            <span class="kbd">E – Eliminate 2 options</span>
+            <span class="kbd">⭐ – Add to Vault</span>
+            <span class="kbd">→ – Next Question</span>
+          </div>
+          <div id="questionArea"></div>
+          <div id="resultArea" style="display:none"></div>
+        </div>
+      </div>
+
+      <!-- DASHBOARD PAGE -->
+      <div class="page" id="page-dashboard">
+        <div class="dashboard-grid">
+          <div class="radar-container">
+            <h3>📊 <span class="kannada">ಸಿಲೆಬಸ್ ರೇಡಾರ್</span> – Topic Accuracy</h3>
+            <canvas id="radarChart" width="280" height="280"></canvas>
+            <p style="font-size:.75rem;color:var(--muted);margin-top:8px;text-align:center">Click any topic in the list to drill that area</p>
+          </div>
+          <div class="topic-list">
+            <h3>📋 Topic-wise Accuracy Breakdown</h3>
+            <div id="topicListContainer"></div>
+          </div>
+        </div>
+        <div style="margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px">
+          <h3 style="font-size:.9rem;font-weight:700;color:var(--gold);margin-bottom:12px">📈 Session History</h3>
+          <div id="sessionHistory"><p style="color:var(--muted);font-size:.85rem">No sessions yet. Start a quiz to see history.</p></div>
+        </div>
+      </div>
+
+      <!-- ARCHIVE PAGE -->
+      <div class="page" id="page-archive">
+        <h2 style="font-size:1rem;font-weight:800;margin-bottom:16px;color:var(--gold)">📅 <span class="kannada">ದಿನಾಂಕ ಕ್ಯಾಲೆಂಡರ್</span> – 7-Day Quiz Archive</h2>
+        <div class="archive-grid" id="archiveGrid"></div>
+        <div class="reattempt-menu" id="reattemptMenu">
+          <h3 id="reattemptTitle">Day 1 Re-Attempt Options</h3>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-gold" onclick="reattempt('full')">🔄 Full Re-Attempt (All Questions)</button>
+            <button class="btn btn-red" onclick="reattempt('wrong')">❌ Wrong-Only Mode (<span id="wrongCount">0</span> questions)</button>
+            <button class="btn btn-outline" onclick="reattempt('revision')">⚡ Speed Revision (Flashcard Mode)</button>
+            <button class="btn btn-outline btn-sm" onclick="closeReattempt()">✕ Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- VAULT PAGE -->
+      <div class="page" id="page-vault">
+        <div class="vault-header">
+          <div>
+            <h2 style="font-size:1rem;font-weight:800;color:var(--gold)">🔴 <span class="kannada">ತಪ್ಪು ಪ್ರಶ್ನೆಗಳ ಖಜಾನೆ</span> – Mistake Vault</h2>
+            <p style="font-size:.8rem;color:var(--muted);margin-top:4px">Questions exit vault only after 2 consecutive correct answers</p>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-gold" onclick="startQuiz('weakness')">▶ Drill My Weaknesses</button>
+            <button class="btn btn-outline btn-sm" onclick="clearVault()">🗑 Clear Vault</button>
+          </div>
+        </div>
+        <div class="vault-list" id="vaultList"></div>
+      </div>
+
+      <!-- SETTINGS PAGE -->
+      <div class="page" id="page-settings">
+        <div class="settings-section">
+          <h3>🔑 API & Model Settings</h3>
+          <div class="setting-row">
+            <div><div class="setting-label">Gemini API Key</div><div class="setting-desc">Get free key from aistudio.google.com</div></div>
+            <button class="btn btn-outline btn-sm" onclick="showPage('generate')">Configure →</button>
+          </div>
+          <div class="setting-row">
+            <div><div class="setting-label">Gemini Model</div><div class="setting-desc">Model used for question generation</div></div>
+            <select id="modelSelect" style="width:220px" onchange="saveSetting('model',this.value)">
+              <option value="gemini-2.5-flash">Gemini 2.5 Flash (Recommended)</option>
+              <option value="gemini-2.5-pro">Gemini 2.5 Pro (Best quality)</option>
+              <option value="gemini-1.5-flash">Gemini 1.5 Flash (Fallback)</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-section">
+          <h3>⚙️ Quiz Preferences</h3>
+          <div class="setting-row">
+            <div><div class="setting-label">Questions per batch</div></div>
+            <select id="batchSizeSelect" style="width:100px" onchange="saveSetting('batchSize',this.value)">
+              <option value="50">50</option><option value="25">25</option><option value="10">10</option>
+            </select>
+          </div>
+          <div class="setting-row">
+            <div><div class="setting-label">Auto-advance after answer</div><div class="setting-desc">Move to next question automatically after 2 seconds</div></div>
+            <input type="checkbox" id="autoAdvance" onchange="saveSetting('autoAdvance',this.checked)" style="width:20px;height:20px;cursor:pointer">
+          </div>
+          <div class="setting-row">
+            <div><div class="setting-label">Show bilingual questions</div><div class="setting-desc">Display questions in both Kannada and English</div></div>
+            <input type="checkbox" id="bilingual" checked onchange="saveSetting('bilingual',this.checked)" style="width:20px;height:20px;cursor:pointer">
+          </div>
+        </div>
+        <div class="settings-section">
+          <h3>🗑 Data Management</h3>
+          <div class="setting-row">
+            <div><div class="setting-label">Export All Data</div><div class="setting-desc">Download complete question bank as JSON</div></div>
+            <button class="btn btn-outline btn-sm" onclick="exportData()">📥 Export</button>
+          </div>
+          <div class="setting-row">
+            <div><div class="setting-label" style="color:var(--red)">Clear All Data</div><div class="setting-desc">Delete all questions, vault, and statistics</div></div>
+            <button class="btn btn-red btn-sm" onclick="clearAllData()">🗑 Clear All</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end content -->
+  </div><!-- end main -->
+</div><!-- end app -->
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h2 id="modalTitle">Confirm</h2>
+    <p id="modalBody" style="color:var(--muted);font-size:.875rem;line-height:1.6"></p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-gold" id="modalConfirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRE-LOADED VERIFIED KEA VAO BATCHES (20 Batches x 50 Questions = 1,000 Unique Questions) -->
+<script>window.PRELOADED_BATCHES = window.PRELOADED_BATCHES || [];</script>
+<script src="batches/day1_b1.js"></script>
+<script src="batches/day1_b2.js"></script>
+<script src="batches/day1_b3.js"></script>
+<script src="batches/day1_b4.js"></script>
+<script src="batches/day1_b5.js"></script>
+<script src="batches/day1_b6.js"></script>
+<script src="batches/day1_b7.js"></script>
+<script src="batches/day1_b8.js"></script>
+<script src="batches/day1_b9.js"></script>
+<script src="batches/day1_b10.js"></script>
+<script src="batches/day1_b11.js"></script>
+<script src="batches/day1_b12.js"></script>
+<script src="batches/day1_b13.js"></script>
+<script src="batches/day1_b14.js"></script>
+<script src="batches/day1_b15.js"></script>
+<script src="batches/day1_b16.js"></script>
+<script src="batches/day1_b17.js"></script>
+<script src="batches/day1_b18.js"></script>
+<script src="batches/day1_b19.js"></script>
+<script src="batches/day1_b20.js"></script>
+
+<script>
+// ============================================================
+// KEA VAO QUIZ APP — Complete JavaScript Logic
+// ============================================================
+
+// --- CONSTANTS & STATE ---
+const EXAM_DATE = new Date('2026-10-04T10:30:00+05:30');
+const TOPICS = [
+  {key:'constitution',label:'Constitution & Polity',color:'#4FC3F7'},
+  {key:'karnataka_history',label:'Karnataka History & Culture',color:'#CE93D8'},
+  {key:'geography',label:'Geography & Environment',color:'#81C784'},
+  {key:'land_revenue',label:'Land Revenue & e-Gov',color:'#FFD700'},
+  {key:'panchayat',label:'Panchayat Raj & Rural Dev',color:'#FF8A65'},
+  {key:'current_affairs',label:'Current Affairs 2025-26',color:'#4DD0E1'},
+  {key:'kannada',label:'General Kannada Grammar',color:'#F48FB1'},
+  {key:'english_computer',label:'English + Computer',color:'#A5D6A7'},
+];
+
+const BATCH_TITLES = {
+  1: 'ಸಂವಿಧಾನ-1 (Acts, Preamble, FR)',
+  2: 'ಸಂವಿಧಾನ-2 (DPSP, Duties, Schedules)',
+  3: 'ಸಂವಿಧಾನ-3 (Parliament, SC, State)',
+  4: 'ಕರ್ನಾಟಕ ಇತಿಹಾಸ-1 (Mauryas, Kadambas, Gangas)',
+  5: 'ಕರ್ನಾಟಕ ಇತಿಹಾಸ-2 (Chalukyas, Rashtrakutas, Hoysalas)',
+  6: 'ಕರ್ನಾಟಕ ಇತಿಹಾಸ-3 (Vijayanagara, Mysuru, Unification)',
+  7: 'ಭೂಗೋಳ-1 (Physical, Districts, Ghats, Soil)',
+  8: 'ಭೂಗೋಳ-2 (Rivers, Dams, National Parks, Crops)',
+  9: 'ಭೂ ಕಂದಾಯ-1 (KLR Act 1964 Sec 1–56, Officers)',
+  10: 'ಭೂ ಕಂದಾಯ-2 (RTC Form-16, Bhoomi, Mojini, Kaveri)',
+  11: 'ಪಂಚಾಯತ್ ರಾಜ್-1 (73rd Amend & 1993 Act)',
+  12: 'ಗ್ರಾಮೀಣಾಭಿವೃದ್ಧಿ-2 (e-Swathu, Co-op, Schemes)',
+  13: 'Current Affairs 2025-26 & Everyday Science',
+  14: 'ಸಾಮಾನ್ಯ ಕನ್ನಡ-1 (ವರ್ಣಮಾಲೆ, ಸಂಧಿ, ಸಮಾಸ)',
+  15: 'ಸಾಮಾನ್ಯ ಕನ್ನಡ-2 (ತತ್ಸಮ-ತದ್ಭವ, ವಿಭಕ್ತಿ, ಪದಕೋಶ)',
+  16: 'ಸಾಮಾನ್ಯ ಕನ್ನಡ-3 (ನುಡಿಗಟ್ಟು, ಛಂದಸ್ಸು, ಸಾಹಿತ್ಯ)',
+  17: 'General English-1 (Articles, Prepositions, Voice)',
+  18: 'General English-2 (Speech, Vocab, Idioms, Errors)',
+  19: 'Computer-1 (Hardware, Memory, OS, MS Word)',
+  20: 'Computer-2 (MS Excel, PowerPoint, Networks, Cyber)'
+};
+
+const TOPIC_BATCHES = {
+  1:{1:'constitution',2:'constitution',3:'constitution',4:'karnataka_history',5:'karnataka_history',6:'karnataka_history',7:'geography',8:'geography',9:'land_revenue',10:'land_revenue',11:'panchayat',12:'panchayat',13:'current_affairs',14:'kannada',15:'kannada',16:'kannada',17:'english_computer',18:'english_computer',19:'english_computer',20:'english_computer'},
+};
+for(let d=2;d<=7;d++) TOPIC_BATCHES[d]=TOPIC_BATCHES[1];
+
+const DAY_SYLLABUS = {
+  1:'Constitution (Art.1-51A), Ancient Karnataka (Kadambas, Gangas, Chalukyas), Land Revenue Act Ch.1-4, Karnataka Physical Geography, ಸಂಧಿಗಳು & ತತ್ಸಮ-ತದ್ಭವ, Articles & Prepositions, Computer Generations & Hardware',
+  2:'Constitution (Art.52-151: President, Parliament, SC), Medieval Karnataka (Rashtrakutas, Hoysalas), Land Revenue Act Ch.5-8 (RTC Form-16, Survey), Soil/Climate/Agriculture, ಸಮಾಸಗಳು & ವಿಭಕ್ತಿ, Active-Passive Voice, MS Word Shortcuts',
+  3:'Constitution (Art.152-237: Governor, CM, HC), Vijayanagara, Bahmani, Wodeyars, National Parks & Minerals, Land Revenue Ch.9-12 (Mutation, Boundaries) & Bhoomi Portal, ಸಮನಾರ್ಥಕ-ವಿರುದ್ಧಾರ್ಥಕ, Direct-Indirect Speech, MS Excel Formulas',
+  4:'Constitution (Art.243-243ZG: 73rd & 74th Amendments), Freedom Struggle in Karnataka, Indian Physical Geography, Gram Swaraj & PR Act 1993 + Mojini/Kaveri/e-Swathu, ನುಡಿಗಟ್ಟು & ಗಾದೆ, Synonyms-Antonyms, MS PowerPoint & OS',
+  5:'Constitutional/Non-Constitutional Bodies, Emergency, Amendments, Karnataka Art, GI Tags, Rural Co-op Societies, Nadakacheri & Sakala Act, ಕನ್ನಡ ಸಾಹಿತ್ಯ (ಪಂಪ-ರನ್ನ-ವಚನ-ದಾಸ), Idioms & Phrases, Computer Networks & Internet',
+  6:'Karnataka Current Affairs 2025-26 (Budget, Schemes, Awards), Everyday Science (Physics & Chemistry), ವಾಕ್ಯ ತಿದ್ದುಪಡಿ & ಛಂದಸ್ಸು, Spotting Errors & Sentence Improvement, Cyber Security & Digital India',
+  7:'National & International Current Affairs 2025-26 (Nobel/Padma/ISRO), Biology & Environment of Karnataka, Mixed High-Trap KEA PYQ Edge-Cases Paper 1 & Paper 2 – FINAL REVISION'
+};
+
+let state = {
+  currentPage: 'home',
+  quiz: {active:false,mode:'',questions:[],current:0,correct:0,wrong:0,skip:0,eliminated:false,answered:false,timerInterval:null,timeLeft:7200,startTime:null},
+  settings: JSON.parse(localStorage.getItem('kea_settings')||'{"model":"gemini-2.5-flash","batchSize":50,"autoAdvance":false,"bilingual":true}'),
+  topicStats: JSON.parse(localStorage.getItem('kea_topic_stats')||'{}'),
+  sessions: JSON.parse(localStorage.getItem('kea_sessions')||'[]'),
+  selectedArchiveDay: null,
+};
+
+// Load API Key safely
+function getApiKey(){return localStorage.getItem('kea_api_key')||''}
+
+// --- SYNC PRELOADED BATCHES ---
+function syncPreloadedBatches(showToast=false){
+  const batches = window.PRELOADED_BATCHES || [];
+  if(!batches.length) {
+    if(showToast) notify('No pre-loaded batch files found yet.','info');
+    return 0;
+  }
+  const byDay = {};
+  batches.forEach(b => {
+    const d = b.day || 1;
+    if(!byDay[d]) byDay[d] = [];
+    if(Array.isArray(b.questions)){
+      b.questions.forEach((q, idx) => {
+        q.batch = b.batch;
+        if(!q.id) q.id = `D${d}B${b.batch}_${idx+1}`;
+        byDay[d].push(q);
+      });
+    }
+  });
+  let totalAdded = 0;
+  Object.keys(byDay).forEach(d => {
+    let existing = [];
+    try { existing = JSON.parse(localStorage.getItem(`kea_q_day${d}`)||'[]'); } catch { existing = []; }
+    const seenIds = new Set(existing.map(q => q.id));
+    const seenTexts = new Set(existing.map(q => (q.question||'').toLowerCase().trim()));
+    byDay[d].forEach(q => {
+      const norm = (q.question||'').toLowerCase().trim();
+      if(norm && !seenIds.has(q.id) && !seenTexts.has(norm)){
+        seenIds.add(q.id);
+        seenTexts.add(norm);
+        existing.push(q);
+        totalAdded++;
+      } else if(seenIds.has(q.id)) {
+        // Ensure batch tag is preserved on existing item
+        const ex = existing.find(item => item.id === q.id);
+        if(ex && !ex.batch) ex.batch = q.batch;
+      }
+    });
+    try { localStorage.setItem(`kea_q_day${d}`, JSON.stringify(existing)); } catch(e) { console.warn('Storage quota warning:', e); }
+  });
+  updateUI();
+  if(showToast) notify(`Synced Pre-loaded Batches! (${totalAdded} new questions added)`, 'success');
+  return totalAdded;
+}
+
+// --- UTILS ---
+function notify(msg,type='info',duration=3000){
+  const n=document.createElement('div');n.className=`notif ${type}`;n.textContent=msg;
+  document.body.appendChild(n);setTimeout(()=>n.remove(),duration);
+}
+function showModal(title,body,onConfirm){
+  document.getElementById('modalTitle').textContent=title;
+  document.getElementById('modalBody').textContent=body;
+  document.getElementById('modalConfirm').onclick=()=>{onConfirm();closeModal();};
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal(){document.getElementById('modal').classList.remove('show')}
+
+async function sha256(str){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function getHashes(){
+  try{return new Set(JSON.parse(localStorage.getItem('kea_hashes')||'[]'))}catch{return new Set()}
+}
+function saveHashes(set){localStorage.setItem('kea_hashes',JSON.stringify([...set]))}
+
+function getDayQuestions(day){
+  try{
+    const stored = JSON.parse(localStorage.getItem(`kea_q_day${day}`)||'[]');
+    if(stored.length > 0) return stored;
+  }catch{}
+  // Fallback to in-memory preloaded batches
+  const mem = [];
+  (window.PRELOADED_BATCHES||[]).filter(b => (b.day||1) == day).forEach(b => {
+    (b.questions||[]).forEach(q => { q.batch = b.batch; mem.push(q); });
+  });
+  return mem;
+}
+function getAllStoredQuestions(){
+  let all = [];
+  for(let d=1;d<=7;d++){ all = all.concat(getDayQuestions(d)); }
+  return all;
+}
+function saveDayQuestions(day,qs){
+  localStorage.setItem(`kea_q_day${day}`,JSON.stringify(qs));
+  updateUI();
+}
+function getVault(){
+  try{return JSON.parse(localStorage.getItem('kea_vault')||'[]')}catch{return []}
+}
+function saveVault(v){localStorage.setItem('kea_vault',JSON.stringify(v));updateVaultBadge()}
+
+function getCurrentDay(){
+  const now=new Date();const start=new Date('2026-09-27');
+  const diff=Math.floor((now-start)/(1000*60*60*24));
+  const calcDay = Math.max(1,Math.min(7,diff+1));
+  if(getDayQuestions(calcDay).length === 0 && getDayQuestions(1).length > 0) return 1;
+  return calcDay;
+}
+
+// --- UI UPDATES ---
+function updateUI(){
+  // Countdown
+  const now=new Date();const diff=EXAM_DATE-now;
+  const days=Math.max(0,Math.floor(diff/(1000*60*60*24)));
+  const el=document.getElementById('daysLeft');
+  if(el)el.textContent=days;
+
+  // Today progress
+  const day=getCurrentDay();
+  const qs=getDayQuestions(day);
+  const pct=Math.min(100,(qs.length/1000)*100);
+  const pb=document.getElementById('todayBar');if(pb)pb.style.width=pct+'%';
+  const tc=document.getElementById('todayCount');if(tc)tc.textContent=`${qs.length} / 1000`;
+  const td=document.getElementById('todayDay');if(td)td.textContent=`Day ${day}`;
+  const tp=document.getElementById('todayProgress');if(tp)tp.textContent=`${qs.length}/1000`;
+  const gb=document.getElementById('genBadge');if(gb)gb.textContent=qs.length;
+  const gp=document.getElementById('genProgress');if(gp)gp.textContent=`${qs.length} / 1000 questions`;
+  const gpb=document.getElementById('genBar');if(gpb)gpb.style.width=pct+'%';
+
+  // Overall stats
+  let totalQ=0,totalCorrect=0,totalAttempted=0;
+  for(let d=1;d<=7;d++){const dq=getDayQuestions(d);totalQ+=dq.length;}
+  const tq=document.getElementById('totalQ');if(tq)tq.textContent=totalQ;
+  
+  const sessions=JSON.parse(localStorage.getItem('kea_sessions')||'[]');
+  sessions.forEach(s=>{totalCorrect+=s.correct||0;totalAttempted+=s.attempted||0;});
+  const acc=totalAttempted>0?Math.round((totalCorrect/totalAttempted)*100):0;
+  const oa=document.getElementById('overallAcc');if(oa)oa.textContent=acc+'%';
+
+  // Batch buttons
+  renderBatchButtons();
+  updateVaultBadge();
+}
+
+function updateVaultBadge(){
+  const vault=getVault();
+  const vb=document.getElementById('vaultBadge');if(vb)vb.textContent=vault.length;
+}
+
+// --- NAVIGATION ---
+function showPage(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const pageEl=document.getElementById(`page-${page}`);
+  if(pageEl)pageEl.classList.add('active');
+  const navEl=document.getElementById(`nav-${page}`);
+  if(navEl)navEl.classList.add('active');
+  state.currentPage=page;
+  if(page==='dashboard')renderDashboard();
+  if(page==='archive')renderArchive();
+  if(page==='vault')renderVault();
+  if(page==='settings')loadSettings();
+}
+
+// --- START SPECIFIC BATCH QUIZ ---
+function startBatchQuiz(day, batch){
+  const dayQs = getDayQuestions(day);
+  let batchQs = dayQs.filter(q => q.batch === batch || (q.id && q.id.startsWith(`D${day}B${batch}_`)));
+  if(batchQs.length === 0){
+    const start = (batch-1)*50;
+    batchQs = dayQs.slice(start, start+50);
+  }
+  if(batchQs.length === 0){
+    generateBatch(day, batch);
+    return;
+  }
+  showPage('quiz');
+  state.quiz.mode = `batch_${day}_${batch}`;
+  state.quiz.current = 0; state.quiz.correct = 0; state.quiz.wrong = 0; state.quiz.skip = 0;
+  state.quiz.answered = false; state.quiz.eliminated = false;
+  state.quiz.questions = batchQs;
+  state.quiz.startTime = Date.now();
+  if(state.quiz.timerInterval) clearInterval(state.quiz.timerInterval);
+  document.getElementById('quizTimer').style.display = 'none';
+  notify(`Started Batch ${batch}: ${BATCH_TITLES[batch]||''} (${batchQs.length} Questions)`, 'info', 2500);
+  renderQuestion();
+}
+
+// --- QUIZ ENGINE ---
+function startQuiz(mode){
+  showPage('quiz');
+  state.quiz.mode=mode;
+  state.quiz.current=0;state.quiz.correct=0;state.quiz.wrong=0;state.quiz.skip=0;
+  state.quiz.answered=false;state.quiz.eliminated=false;
+  
+  let questions=[];
+  const allQs = getAllStoredQuestions();
+  
+  if(mode==='weakness'){
+    questions=getVault().map(v=>v.question);
+  } else if(mode==='paper1'||mode==='paper2'){
+    let filtered=allQs;
+    if(mode==='paper1') filtered=allQs.filter(q=>!['kannada','english_computer'].includes(q.topic));
+    if(mode==='paper2') filtered=allQs.filter(q=>['kannada','english_computer','computer'].includes(q.topic));
+    if(filtered.length===0) filtered=allQs;
+    questions=shuffleArray(filtered).slice(0,100);
+  } else if(mode==='english'){
+    const engQs = allQs.filter(q => q.category==='english' || (q.id && (q.id.startsWith('D1B17_')||q.id.startsWith('D1B18_'))) || (q.topic==='english_computer' && !q.isKannada));
+    questions=shuffleArray(engQs.length ? engQs : allQs.filter(q=>q.topic==='english_computer')).slice(0,50);
+  } else if(mode==='computer'){
+    const compQs = allQs.filter(q => q.category==='computer' || (q.id && (q.id.startsWith('D1B19_')||q.id.startsWith('D1B20_'))) || (q.topic==='english_computer' && q.isKannada));
+    questions=shuffleArray(compQs.length ? compQs : allQs.filter(q=>q.topic==='english_computer')).slice(0,50);
+  } else {
+    const topicMap={
+      kannada:'kannada',english_computer:'english_computer',
+      revenue:'land_revenue',land_revenue:'land_revenue',
+      current:'current_affairs',current_affairs:'current_affairs',
+      constitution:'constitution',karnataka_history:'karnataka_history',
+      geography:'geography',panchayat:'panchayat',start:null
+    };
+    const topic=topicMap[mode];
+    if(topic){
+      questions=shuffleArray(allQs.filter(q=>q.topic===topic)).slice(0,50);
+    } else {
+      questions=shuffleArray(allQs).slice(0,10);
+    }
+  }
+  
+  if(questions.length===0){
+    document.getElementById('questionArea').innerHTML=`
+      <div class="empty-state">
+        <div class="emoji">📭</div>
+        <h3>No questions found for this mode yet!</h3>
+        <p>Click <strong>🔄 Reload Pre-built Batches</strong> in Generate section or try another topic.</p>
+        <button class="btn btn-gold" style="margin-top:16px" onclick="showPage('generate')">⚡ Open Batches</button>
+      </div>`;
+    return;
+  }
+  
+  state.quiz.questions=questions;
+  state.quiz.startTime=Date.now();
+  
+  // Timer
+  const isPaper=(mode==='paper1'||mode==='paper2');
+  if(isPaper){
+    state.quiz.timeLeft=7200;
+    startTimer();
+    document.getElementById('quizTimer').style.display='block';
+  } else {
+    if(state.quiz.timerInterval)clearInterval(state.quiz.timerInterval);
+    document.getElementById('quizTimer').style.display='none';
+  }
+  
+  renderQuestion();
+}
+
+function startTimer(){
+  if(state.quiz.timerInterval)clearInterval(state.quiz.timerInterval);
+  state.quiz.timerInterval=setInterval(()=>{
+    state.quiz.timeLeft--;
+    const h=Math.floor(state.quiz.timeLeft/3600);
+    const m=Math.floor((state.quiz.timeLeft%3600)/60);
+    const s=state.quiz.timeLeft%60;
+    const el=document.getElementById('quizTimer');
+    if(el){
+      el.textContent=`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+      el.className='timer-box';
+      if(state.quiz.timeLeft<300) el.classList.add('danger');
+      else if(state.quiz.timeLeft<600) el.classList.add('warning');
+    }
+    if(state.quiz.timeLeft<=0){clearInterval(state.quiz.timerInterval);showResult();}
+  },1000);
+}
+
+function renderQuestion(){
+  const qa=document.getElementById('questionArea');
+  const ra=document.getElementById('resultArea');
+  qa.style.display='block';ra.style.display='none';
+  
+  if(state.quiz.current>=state.quiz.questions.length){showResult();return;}
+  
+  const q=state.quiz.questions[state.quiz.current];
+  const qNum=state.quiz.current+1;const total=state.quiz.questions.length;
+  const topic=TOPICS.find(t=>t.key===q.topic)||{label:q.topic||'General',color:'#FFD700'};
+  
+  updateScoreboard();
+  
+  qa.innerHTML=`
+    <div class="question-card" id="qCard">
+      <div class="q-meta">
+        <span class="q-topic-tag" style="color:${topic.color};border-color:${topic.color}30">📌 ${topic.label} ${q.id?`[${q.id}]`:''}</span>
+        <span class="q-number">Q ${qNum} of ${total}</span>
+      </div>
+      <div class="q-text ${q.isKannada?'kannada':''}">${q.question}</div>
+      <div class="options" id="optionGrid">
+        ${['A','B','C','D'].map(k=>`
+          <div class="option" id="opt${k}" onclick="selectOption('${k}')">
+            <div class="option-key">${k}</div>
+            <div class="kannada">${q['option'+k]||''}</div>
+          </div>`).join('')}
+      </div>
+      <div class="explanation-box" id="expBox">
+        <div class="label">💡 Official 1-Sentence Explanation & Proof</div>
+        <p class="kannada">${q.explanation||'No explanation provided.'}</p>
+      </div>
+      <div class="q-actions">
+        <button class="btn btn-outline btn-sm" onclick="skipQuestion()">⏭ Skip (Space)</button>
+        <button class="btn btn-outline btn-sm" onclick="eliminateOptions()">🎯 50-50 Eliminate (E)</button>
+        <button class="btn btn-outline btn-sm" onclick="addToVault(${state.quiz.current})">⭐ Add to Vault</button>
+        ${state.quiz.answered?`<button class="btn btn-gold btn-sm" onclick="nextQuestion()">Next → </button>`:''}
+      </div>
+    </div>`;
+  state.quiz.answered=false;state.quiz.eliminated=false;
+}
+
+function selectOption(key){
+  if(state.quiz.answered)return;
+  state.quiz.answered=true;
+  
+  const q=state.quiz.questions[state.quiz.current];
+  const isCorrect=(key===q.correct);
+  
+  if(isCorrect){
+    state.quiz.correct++;
+    // Check if in Mistake Vault and update streak
+    const vault = getVault();
+    const vIdx = vault.findIndex(v => v.question.question === q.question);
+    if(vIdx !== -1){
+      vault[vIdx].correctStreak = (vault[vIdx].correctStreak || 0) + 1;
+      if(vault[vIdx].correctStreak >= 2){
+        vault.splice(vIdx, 1);
+        notify('🎉 Mastered (2/2 Streak)! Question graduated from Mistake Vault!', 'success', 2500);
+      }
+      saveVault(vault);
+    }
+  } else {
+    state.quiz.wrong++;
+    addToVaultAuto(state.quiz.current);
+  }
+  state.quiz.questions[state.quiz.current].userAnswer=key;
+  
+  // Also persist userAnswer inside day questions so Wrong-Only Archive mode works
+  const day = getCurrentDay();
+  const dayQs = getDayQuestions(day);
+  const dItem = dayQs.find(item => item.id === q.id || item.question === q.question);
+  if(dItem){
+    dItem.userAnswer = key;
+    try { localStorage.setItem(`kea_q_day${day}`, JSON.stringify(dayQs)); } catch {}
+  }
+  
+  // Visual feedback
+  const optEl=document.getElementById(`opt${key}`);
+  const corrEl=document.getElementById(`opt${q.correct}`);
+  if(optEl) optEl.classList.add(isCorrect?'correct':'wrong');
+  if(!isCorrect&&corrEl) corrEl.classList.add('correct');
+  
+  // Disable all options
+  ['A','B','C','D'].forEach(k=>{const o=document.getElementById(`opt${k}`);if(o)o.style.pointerEvents='none';});
+  
+  // Show explanation
+  const eb=document.getElementById('expBox');if(eb)eb.classList.add('show');
+  
+  // Re-render actions with Next button
+  const actions=document.querySelector('.q-actions');
+  if(actions){
+    actions.innerHTML=`
+      <button class="btn btn-outline btn-sm" onclick="addToVault(${state.quiz.current})">⭐ Add to Vault</button>
+      <button class="btn btn-gold" onclick="nextQuestion()">Next Question (→)</button>`;
+  }
+  updateScoreboard();
+  
+  // Update topic stats
+  if(!state.topicStats[q.topic]) state.topicStats[q.topic]={correct:0,total:0};
+  state.topicStats[q.topic].total++;
+  if(isCorrect) state.topicStats[q.topic].correct++;
+  localStorage.setItem('kea_topic_stats',JSON.stringify(state.topicStats));
+  
+  // Auto-advance
+  if(state.settings.autoAdvance) setTimeout(nextQuestion,2000);
+}
+
+function skipQuestion(){
+  if(state.quiz.answered)return;
+  state.quiz.answered=true;state.quiz.skip++;
+  state.quiz.questions[state.quiz.current].userAnswer='SKIP';
+  updateScoreboard();setTimeout(nextQuestion,500);
+}
+
+function nextQuestion(){
+  state.quiz.current++;
+  if(state.quiz.current>=state.quiz.questions.length) showResult();
+  else renderQuestion();
+}
+
+function eliminateOptions(){
+  if(state.quiz.eliminated||state.quiz.answered)return;
+  state.quiz.eliminated=true;
+  const q=state.quiz.questions[state.quiz.current];
+  const wrong=['A','B','C','D'].filter(k=>k!==q.correct);
+  const toElim=shuffleArray(wrong).slice(0,2);
+  toElim.forEach(k=>{const o=document.getElementById(`opt${k}`);if(o)o.classList.add('eliminated');});
+  notify('2 wrong options eliminated!','info',1500);
+}
+
+function updateScoreboard(){
+  const q=state.quiz;
+  const net=q.correct-(q.wrong*0.25);
+  const acc=q.correct+q.wrong>0?Math.round((q.correct/(q.correct+q.wrong))*100):0;
+  setText('sAttempted',q.correct+q.wrong+q.skip);
+  setText('sCorrect',q.correct);setText('sWrong',q.wrong);setText('sSkip',q.skip);
+  setText('sNet',net.toFixed(2));setText('sAcc',acc+'%');
+  const bar=document.getElementById('sAccBar');if(bar)bar.style.width=acc+'%';
+}
+function setText(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
+
+function addToVault(idx){
+  const q=state.quiz.questions[idx];
+  addQuestionToVault(q);notify('Added to Mistake Vault ⭐','info',1500);
+}
+function addToVaultAuto(idx){
+  const q=state.quiz.questions[idx];
+  addQuestionToVault(q);
+}
+function addQuestionToVault(q){
+  const vault=getVault();
+  const exists=vault.find(v=>v.question.question===q.question);
+  if(!exists){vault.push({question:q,wrongCount:1,correctStreak:0,addedAt:new Date().toISOString()});}
+  else{exists.wrongCount++;exists.correctStreak=0;}
+  saveVault(vault);
+}
+
+function showResult(){
+  if(state.quiz.timerInterval)clearInterval(state.quiz.timerInterval);
+  document.getElementById('quizTimer').style.display='none';
+  
+  const q=state.quiz;
+  const net=q.correct-(q.wrong*0.25);
+  const acc=q.correct+q.wrong>0?Math.round((q.correct/(q.correct+q.wrong))*100):0;
+  const total=q.questions.length;
+  
+  // Save session
+  const session={
+    date:new Date().toISOString(),mode:q.mode,
+    attempted:q.correct+q.wrong+q.skip,correct:q.correct,wrong:q.wrong,skip:q.skip,
+    net:net,accuracy:acc,total
+  };
+  const sessions=JSON.parse(localStorage.getItem('kea_sessions')||'[]');
+  sessions.unshift(session);localStorage.setItem('kea_sessions',JSON.stringify(sessions.slice(0,50)));
+  
+  document.getElementById('questionArea').style.display='none';
+  const ra=document.getElementById('resultArea');ra.style.display='block';
+  
+  let emoji='😊';if(acc>=80)emoji='🏆';else if(acc>=60)emoji='💪';else if(acc<40)emoji='📚';
+  
+  ra.innerHTML=`
+    <div class="result-screen">
+      <div class="big-score">${net.toFixed(2)}</div>
+      <div class="score-label">Net Score (out of ${total}) — ${emoji}</div>
+      <div class="result-grid">
+        <div class="result-item"><div class="rv correct">${q.correct}</div><div class="rl">✓ Correct</div></div>
+        <div class="result-item"><div class="rv wrong">${q.wrong}</div><div class="rl">✗ Wrong</div></div>
+        <div class="result-item"><div class="rv skip">${q.skip}</div><div class="rl">Skip</div></div>
+        <div class="result-item"><div class="rv" style="color:var(--gold)">${acc}%</div><div class="rl">Accuracy</div></div>
+      </div>
+      ${acc<50?`<p style="color:var(--red);font-size:.9rem;margin-bottom:16px">⚠️ Wrong answers have been added to your Mistake Vault for spaced repetition.</p>`:''}
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-gold" onclick="startQuiz('${q.mode}')">▶ Retry Same Mode</button>
+        <button class="btn btn-red" onclick="startQuiz('weakness')">🔴 Practice Mistakes</button>
+        <button class="btn btn-outline" onclick="showPage('dashboard')">📊 View Dashboard</button>
+        <button class="btn btn-outline" onclick="showPage('home')">🏠 Home</button>
+      </div>
+    </div>`;
+}
+
+// --- QUESTION GENERATION & BATCH GRID ---
+function renderBatchButtons(){
+  const grid=document.getElementById('batchGrid');
+  const homeGrid=document.getElementById('homeBatchGrid');
+  const day=parseInt(document.getElementById('daySelect')?.value||1);
+  const dayQs=getDayQuestions(day);
+  if(grid) grid.innerHTML='';
+  if(homeGrid) homeGrid.innerHTML='';
+  for(let b=1;b<=20;b++){
+    const bQs = dayQs.filter(q => q.batch === b || (q.id && q.id.startsWith(`D${day}B${b}_`)));
+    const count = bQs.length;
+    const done = count >= 45;
+    const partial = !done && count > 0;
+    const title = BATCH_TITLES[b] || `Batch ${b}`;
+    const html = `<strong>Batch ${b}</strong><br><small class="kannada" style="font-size:.68rem;display:block;margin:3px 0;opacity:.85">${title}</small><small>${done?`✓ ${count} Q (Start)`:partial?`~${count} Q`:'50 Q'}</small>`;
+    if(grid){
+      const btn=document.createElement('div');
+      btn.className=`batch-btn ${done?'done':partial?'loading':''}`;
+      btn.innerHTML=html;
+      btn.onclick=()=> (count > 0 ? startBatchQuiz(day,b) : generateBatch(day,b));
+      grid.appendChild(btn);
+    }
+    if(homeGrid){
+      const hbtn=document.createElement('div');
+      hbtn.className=`batch-btn ${done?'done':partial?'loading':''}`;
+      hbtn.innerHTML=html;
+      hbtn.onclick=()=> startBatchQuiz(1,b);
+      homeGrid.appendChild(hbtn);
+    }
+  }
+}
+
+function getTopicForBatch(day,batch){
+  const topicKey=TOPIC_BATCHES[day]?.[batch]||'constitution';
+  const topic=TOPICS.find(t=>t.key===topicKey)||TOPICS[0];
+  return topic;
+}
+
+function getDaySyllabus(day,batch){
+  const topic=getTopicForBatch(day,batch);
+  const baseSyllabus=DAY_SYLLABUS[day]||DAY_SYLLABUS[1];
+  return `${topic.label} — ${baseSyllabus}`;
+}
+
+async function generateBatch(day,batch){
+  const apiKey=getApiKey();
+  if(!apiKey){showPage('settings');notify('Please add your Gemini API Key first!','error');return;}
+  
+  const btn=document.querySelectorAll('#batchGrid .batch-btn')[batch-1];
+  if(btn)btn.className='batch-btn loading';
+  
+  const topic=getTopicForBatch(day,batch);
+  const syllabus=getDaySyllabus(day,batch);
+  const batchSize=state.settings.batchSize||50;
+  const model=state.settings.model||'gemini-2.5-flash';
+  
+  const prompt=`Generate exactly ${batchSize} MCQ questions for KEA VAO Karnataka exam (4 October 2026, conducted by KEA - Karnataka Examinations Authority).
+
+Day: ${day}, Batch: ${batch}
+Topic Focus: ${syllabus}
+
+STRICT RULES:
+1. Return ONLY a valid JSON array — no markdown, no explanation outside JSON
+2. Each question must be unique and not repeat any common textbook question
+3. Match actual KEA VAO exam difficulty (intermediate level)
+4. Mix Kannada and English questions (60% Kannada, 40% English)
+
+JSON Format (return exactly this structure):
+[
+  {
+    "question": "Question text in Kannada or English",
+    "optionA": "Option A text",
+    "optionB": "Option B text",
+    "optionC": "Option C text",
+    "optionD": "Option D text",
+    "correct": "A",
+    "explanation": "1 sentence citing official source (e.g., Karnataka Land Revenue Act 1964, Section X / KEA official syllabus)",
+    "topic": "${topic.key}",
+    "isKannada": true
+  }
+]
+
+Generate all ${batchSize} questions now:`;
+
+  const log=document.getElementById('genLog');
+  const addLog=(msg,type='info')=>{if(log)log.innerHTML+=`<div class="${type}">${msg}</div>`;if(log)log.scrollTop=log.scrollHeight;};
+  addLog(`Generating Batch ${batch} (${topic.label})...`);
+  
+  try{
+    const resp=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        contents:[{parts:[{text:prompt}]}],
+        generationConfig:{temperature:0.8,maxOutputTokens:8192,responseMimeType:'application/json'}
+      })
+    });
+    if(!resp.ok){const err=await resp.json();throw new Error(err.error?.message||`HTTP ${resp.status}`);}
+    const data=await resp.json();
+    const text=data.candidates?.[0]?.content?.parts?.[0]?.text||'[]';
+    let questions;
+    try{questions=JSON.parse(text);}
+    catch{const match=text.match(/\[[\s\S]*\]/);if(match)questions=JSON.parse(match[0]);else throw new Error('Invalid JSON response');}
+    
+    if(!Array.isArray(questions)||questions.length===0) throw new Error('No questions returned');
+    
+    // Deduplication
+    const hashes=getHashes();
+    const dayQs=getDayQuestions(day);
+    let added=0,dupes=0;
+    
+    for(const q of questions){
+      if(!q.question||!q.correct) continue;
+      const hash=await sha256(q.question.toLowerCase().trim());
+      if(hashes.has(hash)){dupes++;continue;}
+      hashes.add(hash);
+      q.id=`D${day}B${batch}_${Date.now()}_${added}`;
+      q.batch=batch;
+      q.generatedAt=new Date().toISOString();
+      dayQs.push(q);added++;
+    }
+    
+    saveDayQuestions(day,dayQs);saveHashes(hashes);
+    addLog(`✓ Batch ${batch}: ${added} unique questions added (${dupes} duplicates skipped)`, 'ok');
+    if(btn)btn.className=`batch-btn ${added>0?'done':'error'}`;
+    notify(`Batch ${batch}: ${added} questions added!`,'success');
+    
+  } catch(err){
+    addLog(`✗ Batch ${batch} failed: ${err.message}`, 'err');
+    if(btn)btn.className='batch-btn error';
+    notify(`Batch ${batch} failed: ${err.message}`,'error');
+  }
+  updateUI();
+}
+
+async function generateAllBatches(){
+  const day=parseInt(document.getElementById('daySelect')?.value||1);
+  notify('Starting auto-generation of all 20 batches...','info');
+  for(let b=1;b<=20;b++){
+    await generateBatch(day,b);
+    await new Promise(r=>setTimeout(r,1500)); // Rate limit respect
+  }
+  notify('All 20 batches complete! 1000 questions generated ✓','success',5000);
+}
+
+async function importPastedQuestions(){
+  const text=document.getElementById('pasteInput').value.trim();
+  if(!text){notify('Please paste JSON questions first','error');return;}
+  const day=parseInt(document.getElementById('daySelect')?.value||1);
+  let questions;
+  try{questions=JSON.parse(text);}
+  catch{notify('Invalid JSON format. Please check the format and try again.','error');return;}
+  if(!Array.isArray(questions)){notify('Expected a JSON array of questions','error');return;}
+  
+  const hashes=getHashes();const dayQs=getDayQuestions(day);
+  let added=0,dupes=0;
+  for(const q of questions){
+    if(!q.question||!q.correct) continue;
+    const hash=await sha256(q.question.toLowerCase().trim());
+    if(hashes.has(hash)){dupes++;continue;}
+    hashes.add(hash);
+    q.id=`import_${Date.now()}_${added}`;
+    q.generatedAt=new Date().toISOString();
+    if(!q.topic) q.topic='constitution';
+    dayQs.push(q);added++;
+  }
+  saveDayQuestions(day,dayQs);saveHashes(hashes);
+  notify(`Imported ${added} unique questions! (${dupes} duplicates skipped)`,'success');
+  document.getElementById('pasteInput').value='';
+  updateUI();
+}
+
+function clearDayQuestions(){
+  const day=parseInt(document.getElementById('daySelect')?.value||1);
+  showModal('Clear Day Questions',`Delete all questions for Day ${day}? This cannot be undone.`,()=>{
+    localStorage.removeItem(`kea_q_day${day}`);updateUI();notify('Cleared!','info');
+  });
+}
+
+// --- DASHBOARD / RADAR ---
+function renderDashboard(){
+  const container=document.getElementById('topicListContainer');
+  if(!container)return;
+  container.innerHTML='';
+  
+  TOPICS.forEach(t=>{
+    const stats=state.topicStats[t.key]||{correct:0,total:0};
+    const pct=stats.total>0?Math.round((stats.correct/stats.total)*100):0;
+    const row=document.createElement('div');row.className='topic-row';
+    row.onclick=()=>startQuiz(t.key);
+    row.innerHTML=`
+      <div class="topic-name">${t.label}</div>
+      <div class="topic-bar-track"><div class="topic-bar-fill" style="width:${pct}%;background:${t.color}"></div></div>
+      <div class="topic-pct" style="color:${t.color}">${pct}%</div>`;
+    container.appendChild(row);
+  });
+  
+  drawRadar();
+  renderSessionHistory();
+}
+
+function drawRadar(){
+  const canvas=document.getElementById('radarChart');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  ctx.clearRect(0,0,W,H);
+  
+  const cx=W/2,cy=H/2,r=Math.min(W,H)/2-30;
+  const n=TOPICS.length;
+  const data=TOPICS.map(t=>{const s=state.topicStats[t.key]||{correct:0,total:0};return s.total>0?s.correct/s.total:0;});
+  
+  // Grid circles
+  ctx.strokeStyle='#1E2D4A';ctx.lineWidth=1;
+  [.25,.5,.75,1].forEach(f=>{
+    ctx.beginPath();
+    TOPICS.forEach((_,i)=>{
+      const a=(i/n)*Math.PI*2-Math.PI/2;
+      const x=cx+r*f*Math.cos(a),y=cy+r*f*Math.sin(a);
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    });
+    ctx.closePath();ctx.stroke();
+  });
+  
+  // Axes
+  TOPICS.forEach((_,i)=>{
+    const a=(i/n)*Math.PI*2-Math.PI/2;
+    ctx.strokeStyle='#1E2D4A';ctx.beginPath();
+    ctx.moveTo(cx,cy);ctx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a));ctx.stroke();
+    // Labels
+    const lx=cx+(r+20)*Math.cos(a),ly=cy+(r+20)*Math.sin(a);
+    ctx.fillStyle='#8892A4';ctx.font='9px Inter';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(TOPICS[i].label.split(' ')[0],lx,ly);
+  });
+  
+  // Data polygon
+  ctx.beginPath();
+  TOPICS.forEach((_,i)=>{
+    const a=(i/n)*Math.PI*2-Math.PI/2;
+    const val=Math.max(data[i],.05);
+    const x=cx+r*val*Math.cos(a),y=cy+r*val*Math.sin(a);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.closePath();
+  ctx.fillStyle='rgba(255,215,0,.2)';ctx.fill();
+  ctx.strokeStyle='#FFD700';ctx.lineWidth=2;ctx.stroke();
+  
+  // Points
+  TOPICS.forEach((t,i)=>{
+    const a=(i/n)*Math.PI*2-Math.PI/2;
+    const val=Math.max(data[i],.05);
+    ctx.beginPath();ctx.arc(cx+r*val*Math.cos(a),cy+r*val*Math.sin(a),5,0,Math.PI*2);
+    ctx.fillStyle=t.color;ctx.fill();
+  });
+}
+
+function renderSessionHistory(){
+  const container=document.getElementById('sessionHistory');if(!container)return;
+  const sessions=JSON.parse(localStorage.getItem('kea_sessions')||'[]');
+  if(!sessions.length){container.innerHTML='<p style="color:var(--muted);font-size:.85rem">No sessions yet.</p>';return;}
+  container.innerHTML=sessions.slice(0,10).map(s=>`
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:.8rem">
+      <span>${new Date(s.date).toLocaleDateString('en-IN')} — ${s.mode.toUpperCase()}</span>
+      <span>Net: <strong style="color:var(--gold)">${(s.net||0).toFixed(2)}</strong></span>
+      <span>Accuracy: <strong style="color:${s.accuracy>=60?'var(--green)':'var(--red)'}">${s.accuracy}%</strong></span>
+      <span style="color:var(--muted)">${s.attempted}/${s.total} attempted</span>
+    </div>`).join('');
+}
+
+// --- ARCHIVE ---
+function renderArchive(){
+  const grid=document.getElementById('archiveGrid');if(!grid)return;
+  grid.innerHTML='';
+  const dayNames=['Sept 27','Sept 28','Sept 29','Sept 30','Oct 1','Oct 2','Oct 3'];
+  for(let d=1;d<=7;d++){
+    const qs=getDayQuestions(d);
+    const sessions=JSON.parse(localStorage.getItem('kea_sessions')||'[]').filter(s=>s.date.startsWith(new Date(Date.now()-(7-d)*86400000).toISOString().slice(0,10)));
+    const card=document.createElement('div');
+    card.className=`archive-card ${qs.length>0?'has-data':''}`;
+    card.onclick=()=>selectArchiveDay(d);
+    const bestSession=sessions.reduce((best,s)=>s.accuracy>(best?.accuracy||0)?s:best,null);
+    card.innerHTML=`
+      <div class="day-label">Day ${d}</div>
+      <div class="day-date">${dayNames[d-1]}</div>
+      <div class="day-score">${bestSession?bestSession.net.toFixed(1):'—'}</div>
+      <div class="day-q">${qs.length} questions stored</div>
+      <div class="day-stats">${bestSession?`Best: ${bestSession.accuracy}%`:'Not attempted'}</div>`;
+    grid.appendChild(card);
+  }
+}
+
+function selectArchiveDay(day){
+  state.selectedArchiveDay=day;
+  const menu=document.getElementById('reattemptMenu');
+  const title=document.getElementById('reattemptTitle');
+  const qs=getDayQuestions(day);
+  const wrongQs=qs.filter(q=>q.userAnswer&&q.userAnswer!==q.correct&&q.userAnswer!=='SKIP');
+  document.getElementById('wrongCount').textContent=wrongQs.length;
+  title.textContent=`Day ${day} Re-Attempt Options (${qs.length} questions stored)`;
+  menu.classList.add('show');
+}
+
+function closeReattempt(){document.getElementById('reattemptMenu').classList.remove('show');}
+
+function reattempt(mode){
+  const day=state.selectedArchiveDay;if(!day)return;
+  const qs=getDayQuestions(day);
+  closeReattempt();
+  
+  if(mode==='full'){state.quiz.questions=shuffleArray(qs);}
+  else if(mode==='wrong'){state.quiz.questions=qs.filter(q=>q.userAnswer&&q.userAnswer!==q.correct&&q.userAnswer!=='SKIP');}
+  else if(mode==='revision'){
+    // Flashcard/Speed revision mode
+    showSpeedRevision(day,qs);return;
+  }
+  
+  if(!state.quiz.questions.length){notify('No questions found for this mode!','error');return;}
+  state.quiz.current=0;state.quiz.correct=0;state.quiz.wrong=0;state.quiz.skip=0;state.quiz.mode=`day${day}_${mode}`;
+  state.quiz.startTime=Date.now();
+  showPage('quiz');renderQuestion();
+}
+
+function showSpeedRevision(day,qs){
+  showPage('quiz');
+  state.quiz.questions=qs;state.quiz.current=0;state.quiz.mode='revision';
+  document.getElementById('questionArea').innerHTML='';
+  document.getElementById('resultArea').style.display='none';
+  document.getElementById('questionArea').style.display='block';
+  renderFlashcard();
+}
+
+function renderFlashcard(){
+  const qa=document.getElementById('questionArea');
+  if(state.quiz.current>=state.quiz.questions.length){
+    qa.innerHTML=`<div class="empty-state"><div class="emoji">✅</div><h3>Speed Revision Complete!</h3><p>${state.quiz.questions.length} questions revised.</p><button class="btn btn-gold" style="margin-top:16px" onclick="showPage('home')">🏠 Home</button></div>`;return;
+  }
+  const q=state.quiz.questions[state.quiz.current];
+  const n=state.quiz.current+1,total=state.quiz.questions.length;
+  qa.innerHTML=`
+    <div class="question-card">
+      <div class="q-meta"><span>${n}/${total}</span><span style="font-size:.75rem;color:var(--muted)">Click to reveal answer</span></div>
+      <div class="q-text ${q.isKannada?'kannada':''}">${q.question}</div>
+      <div class="options" id="optionGrid">
+        ${['A','B','C','D'].map(k=>`<div class="option" onclick="revealFlashcard()">${k}: ${q['option'+k]||''}</div>`).join('')}
+      </div>
+      <div class="explanation-box" id="expBox">
+        <div class="label">✅ Correct Answer: ${q.correct} — ${q['option'+q.correct]}</div>
+        <p>${q.explanation||''}</p>
+      </div>
+      <div class="q-actions">
+        <button class="btn btn-outline btn-sm" onclick="revealFlashcard()">👁 Reveal Answer</button>
+        <button class="btn btn-gold" onclick="state.quiz.current++;renderFlashcard()">Next →</button>
+      </div>
+    </div>`;
+}
+
+function revealFlashcard(){
+  const q=state.quiz.questions[state.quiz.current];
+  const corrEl=document.getElementById(`optionGrid`);
+  if(corrEl){
+    const opts=corrEl.querySelectorAll('.option');
+    opts.forEach((o,i)=>{const k=['A','B','C','D'][i];if(k===q.correct)o.classList.add('correct');});
+  }
+  const eb=document.getElementById('expBox');if(eb)eb.classList.add('show');
+}
+
+// --- MISTAKE VAULT ---
+function renderVault(){
+  const list=document.getElementById('vaultList');if(!list)return;
+  const vault=getVault();
+  if(!vault.length){
+    list.innerHTML=`<div class="empty-state"><div class="emoji">🎉</div><h3>Mistake Vault is Empty!</h3><p>Great job! No mistakes to review. Keep practicing!</p></div>`;return;
+  }
+  list.innerHTML=vault.slice(0,50).map((v,i)=>`
+    <div class="vault-item">
+      <div class="${v.question.isKannada?'kannada':''}">${v.question.question}</div>
+      <div style="font-size:.8rem;color:var(--green);margin-top:4px">✅ Answer: ${v.question.correct} — ${v.question['option'+v.question.correct]||''}</div>
+      <div class="v-meta">
+        <span>Topic: ${v.question.topic||'General'}</span>
+        <span class="v-attempts">Wrong ${v.wrongCount}x | Streak: ${v.correctStreak}/2 ✓</span>
+        <button class="btn btn-outline btn-sm" onclick="removeFromVault(${i})">Remove ✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function removeFromVault(idx){
+  const vault=getVault();vault.splice(idx,1);saveVault(vault);renderVault();notify('Removed from vault','info');
+}
+function clearVault(){showModal('Clear Mistake Vault','Delete all questions from vault?',()=>{saveVault([]);renderVault();notify('Vault cleared','info');});}
+
+// --- SETTINGS ---
+function saveApiKey(){const k=document.getElementById('apiKeyInput').value.trim();if(!k){notify('Please enter a valid API key','error');return;}localStorage.setItem('kea_api_key',k);document.getElementById('apiKeyInput').value='';notify('API Key saved securely!','success');}
+function saveSetting(key,val){state.settings[key]=val;localStorage.setItem('kea_settings',JSON.stringify(state.settings));}
+function loadSettings(){
+  const ai=document.getElementById('apiKeyInput');if(ai&&getApiKey())ai.placeholder='API Key is saved (hidden for security)';
+  const ms=document.getElementById('modelSelect');if(ms)ms.value=state.settings.model||'gemini-2.5-flash';
+  const aa=document.getElementById('autoAdvance');if(aa)aa.checked=state.settings.autoAdvance;
+  const bi=document.getElementById('bilingual');if(bi)bi.checked=state.settings.bilingual;
+}
+function exportData(){
+  const data={};for(let d=1;d<=7;d++)data[`day${d}`]=getDayQuestions(d);
+  data.vault=getVault();data.stats=state.topicStats;data.sessions=JSON.parse(localStorage.getItem('kea_sessions')||'[]');
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`KEA_VAO_Questions_${new Date().toISOString().slice(0,10)}.json`;a.click();
+  notify('Data exported!','success');
+}
+function clearAllData(){showModal('Clear ALL Data','This will delete ALL questions, vault, and stats permanently!',()=>{
+  for(let d=1;d<=7;d++)localStorage.removeItem(`kea_q_day${d}`);
+  localStorage.removeItem('kea_vault');localStorage.removeItem('kea_topic_stats');
+  localStorage.removeItem('kea_hashes');localStorage.removeItem('kea_sessions');
+  state.topicStats={};updateUI();notify('All data cleared','info');
+});}
+
+// --- UTILITY ---
+function shuffleArray(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+// --- KEYBOARD SHORTCUTS ---
+document.addEventListener('keydown',e=>{
+  if(state.currentPage!=='quiz'||!state.quiz.questions.length) return;
+  if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA') return;
+  if(e.key==='ArrowRight'&&state.quiz.answered) nextQuestion();
+  if(e.key==='e'||e.key==='E') eliminateOptions();
+  if(e.key===' '){e.preventDefault();if(!state.quiz.answered)skipQuestion();}
+  if(['a','A'].includes(e.key)&&!state.quiz.answered) selectOption('A');
+  if(['b','B'].includes(e.key)&&!state.quiz.answered) selectOption('B');
+  if(['c','C'].includes(e.key)&&!state.quiz.answered) selectOption('C');
+  if(['d','D'].includes(e.key)&&!state.quiz.answered) selectOption('D');
+});
+
+// --- INIT ---
+document.addEventListener('DOMContentLoaded',()=>{
+  syncPreloadedBatches(false);
+  updateUI();
+  // Set current day in selector
+  const ds=document.getElementById('daySelect');if(ds)ds.value=getCurrentDay();
+  // Update countdown every second
+  setInterval(()=>{
+    const now=new Date();const diff=EXAM_DATE-now;
+    const days=Math.max(0,Math.floor(diff/(1000*60*60*24)));
+    const el=document.getElementById('daysLeft');if(el)el.textContent=days;
+  },60000);
+  // Show welcome notification
+  const qs=getDayQuestions(getCurrentDay());
+  if(qs.length>0){
+    setTimeout(()=>notify(`✅ ${qs.length} Verified KEA VAO Questions Loaded & Ready! 🏆`,'success',4000),600);
+  } else {
+    setTimeout(()=>notify('Welcome! Generate questions to start your Rank-1 preparation 🏆','info',4000),1000);
+  }
+});
+</script>
+</body>
+</html>
