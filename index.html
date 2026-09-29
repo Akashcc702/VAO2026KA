@@ -222,9 +222,64 @@ canvas#radarChart{max-width:280px;max-height:280px}
 
 /* SCROLLBAR */
 ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ===== MOBILE / DESKTOP TOGGLE ===== */
+/* Toggle Button in Header */
+#modeToggleBtn{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:.8rem;font-weight:600;color:var(--white);display:flex;align-items:center;gap:6px;transition:.2s}
+#modeToggleBtn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* Hamburger menu button — hidden on desktop */
+#hamburgerBtn{display:none;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;cursor:pointer;font-size:1.2rem;color:var(--white);align-items:center;justify-content:center;transition:.2s;flex-shrink:0}
+#hamburgerBtn:hover{border-color:var(--gold)}
+
+/* Mobile sidebar overlay */
+#sidebarOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;backdrop-filter:blur(2px)}
+#sidebarOverlay.show{display:block;animation:fadeIn .2s}
+
+/* Mobile sidebar drawer */
+#sidebar.mobile-open{display:flex!important;position:fixed;left:0;top:0;bottom:0;width:280px;z-index:300;box-shadow:4px 0 24px rgba(0,0,0,.5);animation:slideInLeft .25s}
+@keyframes slideInLeft{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+
+/* MOBILE MODE — applied to body */
+body.mobile-mode #sidebar{display:none}
+body.mobile-mode #hamburgerBtn{display:flex}
+body.mobile-mode .options{grid-template-columns:1fr!important}
+body.mobile-mode .batch-grid{grid-template-columns:repeat(2,1fr)!important}
+body.mobile-mode .q-text{font-size:1.1rem!important;line-height:1.8!important}
+body.mobile-mode .q-text.kannada{font-size:1.05rem!important}
+body.mobile-mode .option{padding:16px!important;font-size:.95rem!important}
+body.mobile-mode .scoreboard{gap:10px;padding:10px 12px}
+body.mobile-mode .score-val{font-size:1.1rem}
+body.mobile-mode .result-grid{grid-template-columns:repeat(2,1fr)!important}
+body.mobile-mode .dashboard-grid{grid-template-columns:1fr!important}
+body.mobile-mode .home-grid{grid-template-columns:1fr 1fr!important}
+body.mobile-mode #header{padding:10px 14px;flex-wrap:wrap;gap:8px}
+body.mobile-mode .header-left h1{font-size:.85rem}
+body.mobile-mode .header-left p{font-size:.7rem}
+body.mobile-mode #content{padding:12px}
+body.mobile-mode .question-card{padding:16px}
+body.mobile-mode .keyboard-hints{display:none}
+
+/* Auto-detect at ≤768 px (pure CSS, works alongside JS toggle) */
+@media(max-width:768px){
+  #sidebar{display:none}
+  #hamburgerBtn{display:flex}
+  .options{grid-template-columns:1fr!important}
+  .batch-grid{grid-template-columns:repeat(2,1fr)!important}
+  .q-text{font-size:1.1rem!important;line-height:1.8!important}
+  .option{padding:16px!important}
+  .result-grid{grid-template-columns:repeat(2,1fr)!important}
+  .dashboard-grid{grid-template-columns:1fr!important}
+  .home-grid{grid-template-columns:1fr 1fr!important}
+  #header{padding:10px 14px;flex-wrap:wrap;gap:8px}
+  #content{padding:12px}
+  .question-card{padding:16px}
+  .keyboard-hints{display:none}
+}
 </style>
 </head>
 <body>
+<div id="sidebarOverlay" onclick="closeMobileMenu()"></div>
 <div id="app">
   <!-- SIDEBAR -->
   <div id="sidebar">
@@ -238,25 +293,25 @@ canvas#radarChart{max-width:280px;max-height:280px}
     </div>
     <nav>
       <div class="nav-section">ಮುಖ್ಯ / Main</div>
-      <div class="nav-item active" onclick="showPage('home')" id="nav-home"><span class="icon">🏠</span> Home Dashboard</div>
-      <div class="nav-item" onclick="showPage('generate')" id="nav-generate"><span class="icon">⚡</span> Generate Questions <span class="badge gold" id="genBadge">0</span></div>
+      <div class="nav-item active" onclick="showPage('home');closeMobileMenu()" id="nav-home"><span class="icon">🏠</span> Home Dashboard</div>
+      <div class="nav-item" onclick="showPage('generate');closeMobileMenu()" id="nav-generate"><span class="icon">⚡</span> Generate Questions <span class="badge gold" id="genBadge">0</span></div>
       
       <div class="nav-section">ಕ್ವಿಜ್ ಮೋಡ್ / Quiz Modes</div>
-      <div class="nav-item" onclick="startQuiz('paper1')" id="nav-paper1"><span class="icon">📄</span> Paper 1 – GK (2hr)</div>
-      <div class="nav-item" onclick="startQuiz('paper2')" id="nav-paper2"><span class="icon">📝</span> Paper 2 – Lang+Comp (2hr)</div>
-      <div class="nav-item" onclick="startQuiz('kannada')" id="nav-kannada"><span class="icon">ಕ</span> ಸಾಮಾನ್ಯ ಕನ್ನಡ Drill</div>
-      <div class="nav-item" onclick="startQuiz('english')" id="nav-english"><span class="icon">🔤</span> General English Drill</div>
-      <div class="nav-item" onclick="startQuiz('computer')" id="nav-computer"><span class="icon">💻</span> Computer Knowledge Drill</div>
-      <div class="nav-item" onclick="startQuiz('revenue')" id="nav-revenue"><span class="icon">📋</span> Revenue Act + e-Gov Drill</div>
-      <div class="nav-item" onclick="startQuiz('current')" id="nav-current"><span class="icon">📰</span> Current Affairs 2026 Drill</div>
+      <div class="nav-item" onclick="startQuiz('paper1');closeMobileMenu()" id="nav-paper1"><span class="icon">📄</span> Paper 1 – GK (2hr)</div>
+      <div class="nav-item" onclick="startQuiz('paper2');closeMobileMenu()" id="nav-paper2"><span class="icon">📝</span> Paper 2 – Lang+Comp (2hr)</div>
+      <div class="nav-item" onclick="startQuiz('kannada');closeMobileMenu()" id="nav-kannada"><span class="icon">ಕ</span> ಸಾಮಾನ್ಯ ಕನ್ನಡ Drill</div>
+      <div class="nav-item" onclick="startQuiz('english');closeMobileMenu()" id="nav-english"><span class="icon">🔤</span> General English Drill</div>
+      <div class="nav-item" onclick="startQuiz('computer');closeMobileMenu()" id="nav-computer"><span class="icon">💻</span> Computer Knowledge Drill</div>
+      <div class="nav-item" onclick="startQuiz('revenue');closeMobileMenu()" id="nav-revenue"><span class="icon">📋</span> Revenue Act + e-Gov Drill</div>
+      <div class="nav-item" onclick="startQuiz('current');closeMobileMenu()" id="nav-current"><span class="icon">📰</span> Current Affairs 2026 Drill</div>
       
       <div class="nav-section">ವಿಶ್ಲೇಷಣೆ / Analysis</div>
-      <div class="nav-item" onclick="showPage('dashboard')" id="nav-dashboard"><span class="icon">📊</span> Syllabus Radar</div>
-      <div class="nav-item" onclick="showPage('archive')" id="nav-archive"><span class="icon">📅</span> Day-wise Archive</div>
-      <div class="nav-item" onclick="showPage('vault')" id="nav-vault"><span class="icon">🔴</span> Mistake Vault <span class="badge" id="vaultBadge">0</span></div>
+      <div class="nav-item" onclick="showPage('dashboard');closeMobileMenu()" id="nav-dashboard"><span class="icon">📊</span> Syllabus Radar</div>
+      <div class="nav-item" onclick="showPage('archive');closeMobileMenu()" id="nav-archive"><span class="icon">📅</span> Day-wise Archive</div>
+      <div class="nav-item" onclick="showPage('vault');closeMobileMenu()" id="nav-vault"><span class="icon">🔴</span> Mistake Vault <span class="badge" id="vaultBadge">0</span></div>
       
       <div class="nav-section">ಸೆಟ್ಟಿಂಗ್ / Settings</div>
-      <div class="nav-item" onclick="showPage('settings')" id="nav-settings"><span class="icon">⚙️</span> Settings & API Key</div>
+      <div class="nav-item" onclick="showPage('settings');closeMobileMenu()" id="nav-settings"><span class="icon">⚙️</span> Settings & API Key</div>
     </nav>
     <div class="sidebar-stats">
       <div class="stat-row"><span>Total Questions</span><span class="stat-val" id="totalQ">0</span></div>
@@ -268,6 +323,7 @@ canvas#radarChart{max-width:280px;max-height:280px}
   <!-- MAIN CONTENT -->
   <div id="main">
     <div id="header">
+      <button id="hamburgerBtn" onclick="openMobileMenu()">☰</button>
       <div class="header-left">
         <h1 class="kannada">KEA VAO 2026 – ಗ್ರಾಮ ಆಡಳಿತ ಅಧಿಕಾರಿ ಪರೀಕ್ಷೆ</h1>
         <p id="headerSub">4 ಅಕ್ಟೋಬರ್ 2026 | Paper 1: 10:30–12:30 | Paper 2: 14:30–16:30</p>
@@ -276,11 +332,13 @@ canvas#radarChart{max-width:280px;max-height:280px}
         <div class="timer-box" id="quizTimer" style="display:none">2:00:00</div>
       </div>
       <div class="header-right">
+        <button id="modeToggleBtn" onclick="toggleMobileMode()">💻 Desktop</button>
         <button class="btn btn-outline btn-sm" onclick="showPage('generate')">⚡ Generate</button>
         <button class="btn btn-gold btn-sm" onclick="startQuiz('start')">▶ Start Quiz</button>
       </div>
     </div>
     <div id="content">
+
 
       <!-- HOME PAGE -->
       <div class="page active" id="page-home">
@@ -1542,7 +1600,67 @@ document.addEventListener('DOMContentLoaded',()=>{
   } else {
     setTimeout(()=>notify('Welcome! Generate questions to start your Rank-1 preparation 🏆','info',4000),1000);
   }
+  // Auto-detect device and apply mobile/desktop mode
+  autoDetectDevice();
 });
+
+// ===== MOBILE / DESKTOP TOGGLE FUNCTIONS =====
+function autoDetectDevice(){
+  // Read saved preference first
+  const saved = localStorage.getItem('kea_view_mode');
+  if(saved === 'mobile'){
+    applyMobileMode(true);
+  } else if(saved === 'desktop'){
+    applyMobileMode(false);
+  } else {
+    // Auto-detect by screen width
+    const isMobile = window.innerWidth <= 768;
+    applyMobileMode(isMobile);
+  }
+  // Also react to window resize (for browser/tablet)
+  window.addEventListener('resize',()=>{
+    const saved2 = localStorage.getItem('kea_view_mode');
+    if(!saved2){
+      applyMobileMode(window.innerWidth <= 768);
+    }
+  });
+}
+
+function applyMobileMode(enable){
+  const btn = document.getElementById('modeToggleBtn');
+  if(enable){
+    document.body.classList.add('mobile-mode');
+    if(btn) btn.innerHTML = '📱 Mobile';
+  } else {
+    document.body.classList.remove('mobile-mode');
+    if(btn) btn.innerHTML = '💻 Desktop';
+    closeMobileMenu(); // ensure overlay is closed if switching back to desktop
+  }
+}
+
+function toggleMobileMode(){
+  const isMobile = document.body.classList.contains('mobile-mode');
+  const newMode = !isMobile;
+  localStorage.setItem('kea_view_mode', newMode ? 'mobile' : 'desktop');
+  applyMobileMode(newMode);
+  notify(newMode ? '📱 Mobile Mode ಆಕ್ಟಿವ್! ☰ ಮೆನ್ಯೂ ಬಳಸಿ' : '💻 Desktop Mode ಆಕ್ಟಿವ್!','info',2500);
+}
+
+function openMobileMenu(){
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  if(sidebar){ sidebar.classList.add('mobile-open'); }
+  if(overlay){ overlay.classList.add('show'); }
+  document.body.style.overflow = 'hidden'; // prevent background scroll
+}
+
+function closeMobileMenu(){
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  if(sidebar){ sidebar.classList.remove('mobile-open'); }
+  if(overlay){ overlay.classList.remove('show'); }
+  document.body.style.overflow = '';
+}
 </script>
 </body>
 </html>
